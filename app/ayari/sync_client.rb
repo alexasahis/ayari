@@ -58,7 +58,6 @@ module Ayari
 
 		def clear()
 
-			@storage.remove_r('')
 			Dir.foreach(Ayari::Storage::CACHE_DIRECTORY).each do |fname|
 				path = File.join(Ayari::Storage::CACHE_DIRECTORY, fname)
 				next if File.directory?(path)
@@ -80,26 +79,23 @@ module Ayari
 
 				if !metadata
 					@storage.remove_r(remote_path)
-					put_log("deleted: #{remote_path}")
+					put_log("removed: #{remote_path}")
 					next
 				end
 
 				next if metadata['is_dir']
 
-				registering_path = remote_path
-
 				cache_filename = to_cache_filename(metadata)
-				cache_path = File.join(Ayari::Storage::CACHE_DIRECTORY, cache_filename)
 				size = metadata['bytes']
 
-				if !File.exists?(cache_path) || File.size(cache_path) != size
+				if @storage.get_local_filesize(cache_filename) != size
 					content = @dropbox_client.get_file(remote_path)
-					File.write(cache_path, content)
+					@storage.update_content(cache_filename, content)
 					put_log("created: #{cache_filename}")
 				end
 
-				@storage.update(registering_path, cache_filename)
-				put_log("linked: #{registering_path} -> #{cache_filename}")
+				@storage.update_local_filename(remote_path, cache_filename)
+				put_log("linked: #{remote_path} -> #{cache_filename}")
 
 			end
 

@@ -32,17 +32,14 @@ module Ayari
 
 			case File.extname(remote_path)
 			when '.haml'
-				local_path = storage.get_local_path(remote_path)
-				haml File.read(local_path, encoding: 'utf-8')
+				haml storage.get_content(remote_path).force_encoding('utf-8')
 			when '.md'
-				md_path = storage.get_local_path(remote_path)
-				md_text = File.read(md_path, encoding: 'utf-8')
+				md_text = storage.get_content(remote_path).force_encoding('utf-8')
 				raw_html, locals, template_name = Ayari::MdProcessor.process_md(md_text)
 				if template_name[0] != '/'
 					template_name = File.join(File.dirname(remote_path), template_name)
 				end
-				haml_path = storage.get_local_path(template_name)
-				haml_text = File.read(haml_path, encoding: 'utf-8')
+				haml_text = storage.get_content(template_name).force_encoding('utf-8')
 				locals[:content] = raw_html
 				haml haml_text, locals: locals, ugly: true
 			else
