@@ -16,7 +16,7 @@ describe Ayari::MdProcessor do
 			  contained: "within"
 			  locals: true
 			---
-			##waf
+			##waf {.class-arg #id-arg}
 			relka
 			dotnet
 			[safe link](http://example.com)
@@ -54,6 +54,15 @@ describe Ayari::MdProcessor do
 		expect(locals).not_to include(:template)
 		expect(locals).to include(other: 'options')
 		expect(locals).to include(are: {contained: 'within', locals: true})
+
+	end
+
+	it 'should process arguments of h elements' do
+
+		raw_html, locals, template_name = Ayari::MdProcessor.process_md(@md_1)
+		expect(raw_html).to include('class="class-arg"')
+		expect(raw_html).to include('id="id-arg"')
+		expect(raw_html).not_to include('{.class-arg #id-arg}')
 
 	end
 
