@@ -1,3 +1,4 @@
+require 'haml'
 require 'sinatra/base'
 require 'ayari/storage'
 require 'ayari/md_processor'
