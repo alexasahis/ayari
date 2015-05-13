@@ -20,9 +20,8 @@ module Ayari
 			storage = Ayari::Storage.new
 
 			remote_path_list = [req_path]
-			if req_path[-1] == '/'
-				remote_path_list += INFERRING_FILENAMES.map { |fname| req_path + fname }
-			elsif File.extname(req_path) == ""
+			remote_path_list += INFERRING_FILENAMES.map { |fname| File.join(req_path, fname) }
+			if File.extname(req_path) == ""
 				remote_path_list += INFERRING_EXTS.map { |ext| req_path + ext }
 			end
 
