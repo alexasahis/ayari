@@ -111,6 +111,23 @@ describe Ayari::LocalStorage do
 
 	end
 
+	it 'should update the updated time when #update is called with the same remote_path arg' do
+
+		prev_time = Time.new(2010, 1, 1, 0, 0, 0)
+		next_time = Time.new(2012, 1, 1, 0, 0, 0)
+
+		remote_path = '/remote/path.txt'
+		local_filename = 'local-filename.txt'
+		content = 'file-content'
+
+		Time.stubs(:now).returns(prev_time)
+		@storage.update(remote_path, local_filename, content)
+		Time.stubs(:now).returns(next_time)
+		@storage.update(remote_path, local_filename, content)
+		expect(@storage.get_updated_time(remote_path)).to eq next_time
+
+	end
+
 	it 'should remove the file when #remove_r is called' do
 
 		remote_path = '/remote/path.txt'

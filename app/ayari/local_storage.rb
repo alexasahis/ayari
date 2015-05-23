@@ -49,6 +49,7 @@ module Ayari
 					@db.create_table(TABLE_NAME) do
 						String :remote_path, text: true, primary_key: true
 						String :local_filename, text: true
+						DateTime :updated_at
 					end
 
 				end
@@ -101,6 +102,17 @@ module Ayari
 
 		end
 
+		def get_updated_time(remote_path)
+
+			results = @table.where(remote_path: remote_path.downcase).all
+			if results.count != 1
+				raise StandardError.new('invalid path')
+			end
+
+			results.first[:updated_at]
+
+		end
+
 		def update(remote_path, local_filename, content)
 
 			@db.transaction(isolation: :serializable) do
@@ -109,11 +121,14 @@ module Ayari
 				local_path = File.join(@root, local_filename)
 
 				if target.count == 0
-					@table.insert(remote_path: remote_path.downcase, local_filename: local_filename)
+					@table.insert(remote_path: remote_path.downcase,
+						local_filename: local_filename,
+						updated_at: Time.now)
 				else
 					old_path = File.join(@root, target.first[:local_filename])
 					FileUtils.rm(old_path)
-					target.update(local_filename: local_filename)
+					target.update(local_filename: local_filename,
+						updated_at: Time.now)
 				end
 
 				FileUtils.mkdir_p(File.dirname(local_path))
