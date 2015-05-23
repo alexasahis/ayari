@@ -23,16 +23,30 @@ module Ayari
 			FileUtils.mkdir_p(cache_directory)
 			@db = Sequel.connect(sequel_connection_string)
 
-			if !@db.table_exists?(TABLE_NAME)
+			initialize_database()
 
-				@db.create_table(TABLE_NAME) do
-					String :remote_path, text: true, primary_key: true
-					String :local_filename, text: true
+			@table = @db[TABLE_NAME]
+
+		end
+
+		def initialize_database(force=false)
+
+			@db.transaction(isolation: :serializable) do
+
+				if force
+					@db.drop_table(TABLE_NAME) if @db.table_exists?(TABLE_NAME)
+				end
+
+				if !@db.table_exists?(TABLE_NAME)
+
+					@db.create_table(TABLE_NAME) do
+						String :remote_path, text: true, primary_key: true
+						String :local_filename, text: true
+					end
+
 				end
 
 			end
-
-			@table = @db[TABLE_NAME]
 
 		end
 
@@ -66,14 +80,22 @@ module Ayari
 
 		def get_content(path)
 
-			local_path = get_local_path(path)
-			File.binread(local_path)
+			data = nil
+
+			@db.transaction(isolation: :repeatable) do
+
+				local_path = get_local_path(path)
+				data = File.binread(local_path)
+
+			end
+
+			data
 
 		end
 
 		def update_local_filename(remote_path, local_filename)
 
-			@db.transaction do
+			@db.transaction(isolation: :serializable) do
 
 				target = @table.where(remote_path: remote_path.downcase).for_update
 				if target.count == 0
@@ -88,9 +110,13 @@ module Ayari
 
 		def update_content(local_filename, content)
 
-			local_path = File.join(@root, local_filename)
-			FileUtils.mkdir_p(File.dirname(local_path))
-			File.binwrite(local_path, content)
+			@db.transaction(isolation: :serializable) do
+
+				local_path = File.join(@root, local_filename)
+				FileUtils.mkdir_p(File.dirname(local_path))
+				File.binwrite(local_path, content)
+
+			end
 
 		end
 
@@ -102,7 +128,7 @@ module Ayari
 
 			local_path_list = []
 
-			@db.transaction() do
+			@db.transaction(isolation: :serializable) do
 
 				@table.where(Sequel.like(:remote_path, target)).delete
 				@table.where(remote_path: remote_path).delete
