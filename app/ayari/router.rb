@@ -29,24 +29,33 @@ module Ayari
 			remote_path = remote_path_list.find { |path| storage.exists?(path) }
 
 			raise Sinatra::NotFound if !remote_path
+
 			case File.extname(remote_path)
 			when '.haml'
-				html_string = haml storage.get_content(remote_path).force_encoding('utf-8')
-				etag Digest::SHA512.hexdigest(html_string)
-				html_string
+
+				last_modified storage.get_updated_time(remote_path)
+				haml storage.get_content(remote_path).force_encoding('utf-8')
+
 			when '.md'
+
 				md_text = storage.get_content(remote_path).force_encoding('utf-8')
 				raw_html, locals, template_name = Ayari::MdProcessor.process_md(md_text)
 				if template_name[0] != '/'
 					template_name = File.join(File.dirname(remote_path), template_name)
 				end
+
+				all_files = [remote_path, template_name]
+				updated_times = all_files.map{ |path| storage.get_updated_time(path) }
+				last_modified updated_times.max
+
 				haml_text = storage.get_content(template_name).force_encoding('utf-8')
 				locals[:content] = raw_html
-				html_string = haml haml_text, locals: locals, ugly: true
-				etag Digest::SHA512.hexdigest(html_string)
-				html_string
+				haml haml_text, locals: locals, ugly: true
+
 			else
+
 				send_file storage.get_local_path(remote_path)
+
 			end
 
 		end
