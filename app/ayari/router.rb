@@ -43,6 +43,7 @@ module Ayari
 				if template_name[0] != '/'
 					template_name = File.join(File.dirname(remote_path), template_name)
 				end
+				raise Sinatra::NotFound if ! storage.exists?(template_name)
 
 				all_files = [remote_path, template_name]
 				updated_times = all_files.map{ |path| storage.get_updated_time(path) }
