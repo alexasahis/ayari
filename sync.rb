@@ -10,7 +10,7 @@ if __FILE__ == $0
 	config = YAML.load_file(yaml_path)
 
 	token = config['dropbox_token']
-	logger = ARGV.include?('--verbose') ? Logger.new(STDOUT) : nil
+	logger = ARGV.include?('--silent') ? nil : Logger.new(STDOUT)
 	logger.datetime_format = '%Y/%m/%d-%H:%M:%S.%L' if logger
 	client = Ayari::SyncClient.new(token, logger)
 
