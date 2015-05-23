@@ -1,23 +1,15 @@
+require 'tmpdir'
 require 'rspec_helper'
 require 'ayari/local_storage'
 
 
 describe Ayari::LocalStorage do
 
-	before do
-
-		Ayari::LocalStorage.any_instance.stubs(:raw_initialize).returns(nil)
-		Ayari::LocalStorage.any_instance.stubs(:raw_write).returns(nil)
-		Ayari::LocalStorage.any_instance.stubs(:raw_read).returns('')
-		Ayari::LocalStorage.any_instance.stubs(:raw_size).returns(nil)
-
-	end
-
 	before :each do
 
-		@mem_db = Sequel.sqlite
-		Sequel.expects(:connect).returns(@mem_db)
-		@storage = Ayari::LocalStorage.new
+		@tempdir = Dir.mktmpdir
+		@sequel_string = "sqlite://#{File.join(@tempdir, "cache.db")}"
+		@storage = Ayari::LocalStorage.new(@tempdir, @sequel_string)
 
 	end
 
@@ -42,7 +34,7 @@ describe Ayari::LocalStorage do
 		@storage.update_content(remote_path, content)
 		@storage.update_local_filename(remote_path, local_filename)
 		local_path = @storage.get_local_path(remote_path)
-		expect(local_path).to eq File.join(Ayari::LocalStorage::CACHE_DIRECTORY, local_filename)
+		expect(local_path).to eq File.join(@tempdir, local_filename)
 
 	end
 

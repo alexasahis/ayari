@@ -11,34 +11,17 @@ module Ayari
 		SEQUEL_CONNECTION_STRING = "sqlite://#{File.join(CACHE_DIRECTORY, "cache.db")}"
 		TABLE_NAME = :content
 
+		private_constant :CACHE_DIRECTORY
 		private_constant :SEQUEL_CONNECTION_STRING
 		private_constant :TABLE_NAME
 
-		def raw_initialize()
-			FileUtils.mkdir_p(CACHE_DIRECTORY) if !Dir.exists?(CACHE_DIRECTORY)
-		end
 
-		def raw_write(local_path, content)
-			File.binwrite(local_path, content)
-		end
+		def initialize(cache_directory=CACHE_DIRECTORY,
+			sequel_connection_string=SEQUEL_CONNECTION_STRING)
 
-		def raw_read(local_path)
-			File.binread(local_path)
-		end
-
-		def raw_size(local_path)
-			begin
-				return File.size(local_path)
-			rescue
-			end
-			return nil
-		end
-
-		def initialize()
-
-			raw_initialize()
-
-			@db = Sequel.connect(SEQUEL_CONNECTION_STRING)
+			@root = cache_directory
+			FileUtils.mkdir_p(cache_directory)
+			@db = Sequel.connect(sequel_connection_string)
 
 			if !@db.table_exists?(TABLE_NAME)
 
@@ -61,9 +44,13 @@ module Ayari
 
 		def get_local_filesize(local_file)
 
-			local_path = File.join(CACHE_DIRECTORY, local_file)
-			raw_size(local_path)
-
+			local_path = File.join(@root, local_file)
+			size = nil
+			begin
+				size = File.size(local_path)
+			rescue
+			end
+			size
 		end
 
 		def get_local_path(remote_path)
@@ -73,14 +60,14 @@ module Ayari
 				raise StandardError.new('invalid path')
 			end
 
-			File.join(CACHE_DIRECTORY, results.first[:local_filename])
+			File.join(@root, results.first[:local_filename])
 
 		end
 
 		def get_content(path)
 
 			local_path = get_local_path(path)
-			raw_read(local_path)
+			File.binread(local_path)
 
 		end
 
@@ -101,8 +88,9 @@ module Ayari
 
 		def update_content(local_filename, content)
 
-			local_path = File.join(CACHE_DIRECTORY, local_filename)
-			raw_write(local_path, content)
+			local_path = File.join(@root, local_filename)
+			FileUtils.mkdir_p(File.dirname(local_path))
+			File.binwrite(local_path, content)
 
 		end
 
