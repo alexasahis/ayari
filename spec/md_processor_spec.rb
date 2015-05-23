@@ -15,6 +15,7 @@ describe Ayari::MdProcessor do
 			are:
 			  contained: "within"
 			  locals: true
+			flavor: ayari
 			---
 			##waf {.class-arg #id-arg}
 			relka

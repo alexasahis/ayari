@@ -22,12 +22,18 @@ module Ayari
 			header_md = md_lines[(begin_index+1)..(end_index-1)].join("\n")
 			header = YAML.load(header_md).deep_symbolize_keys
 
-			special_options = [:template, :markdown]
+			special_options = [:template, :markdown, :flavor]
 			locals = header.reject {|key, val| special_options.include?(key) }
 			template_name = header[:template] || ''
 			redcarpet_options = header[:markdown] || {}
 
-			renderer = Ayari::AyariFlavoredRenderer.new(redcarpet_options)
+			renderer = nil
+			if header[:flavor] == 'ayari'
+				renderer = Ayari::AyariFlavoredRenderer.new(redcarpet_options)
+			else
+				renderer = Redcarpet::Render::HTML.new(redcarpet_options)
+			end
+
 			redcarpet = Redcarpet::Markdown.new(renderer)
 			raw_html = redcarpet.render(body_md)
 
