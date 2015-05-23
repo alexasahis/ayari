@@ -50,7 +50,7 @@ describe Ayari::LocalStorage do
 
 	end
 
-	it 'should respond as if there are no such file if the registered file is removed' do
+	it 'should remove the file when #remove_r is called' do
 
 		remote_path = '/remote/path.txt'
 		local_filename = 'local-filename.txt'
@@ -61,6 +61,7 @@ describe Ayari::LocalStorage do
 
 		expect(@storage.exists?(remote_path)).to eq false
 		expect{@storage.get_local_path(remote_path)}.to raise_error
+		expect(File.exists?(File.join(@tempdir, local_filename))).to eq false
 
 	end
 
@@ -75,13 +76,14 @@ describe Ayari::LocalStorage do
 
 			remote_path = File.join(remote_dir, remote_filename)
 			@storage.update(remote_path, local_filename, content)
-			expect(@storage.exists?(remote_path)).to eq true
 			@storage.remove_r(remote_dir)
+
 			expect(@storage.exists?(remote_path)).to eq false
 			expect{@storage.get_local_path(remote_path)}.to raise_error
+			expect(File.exists?(File.join(@tempdir, local_filename))).to eq false
 
 		end
 
 	end
-	
+
 end
