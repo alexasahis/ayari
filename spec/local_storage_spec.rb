@@ -36,6 +36,17 @@ describe Ayari::LocalStorage do
 
 	end
 
+	it 'should store contents correctly' do
+
+		remote_path = '/remote/path.txt'
+		local_filename = 'local-filename.txt'
+		content = 'file-content'
+
+		@storage.update(remote_path, local_filename, content)
+		expect(@storage.get_content(remote_path)).to eq content
+
+	end
+
 	it 'should return false in #exists? if the remote_path is not registered' do
 
 		remote_path = '/remote/path.txt'
@@ -47,6 +58,56 @@ describe Ayari::LocalStorage do
 
 		remote_path = '/remote/path.txt'
 		expect{@storage.get_local_path(remote_path)}.to raise_error
+
+	end
+
+	it 'should raise an error in #get_content if the remote_path is not registered' do
+
+		remote_path = '/remote/path.txt'
+		expect{@storage.get_content(remote_path)}.to raise_error
+
+	end
+
+	it 'should remove the previous file when updating local filename' do
+
+		remote_path = '/remote/path.txt'
+		deleted_local_filename = 'deleted-local-filename.txt'
+		local_filename = 'local-filename.txt'
+		deleted_content = 'deleted-file-content'
+		content = 'file-content'
+
+		@storage.update(remote_path, deleted_local_filename, deleted_content)
+		@storage.update(remote_path, local_filename, content)
+		expect(File.exists?(File.join(@tempdir, deleted_local_filename))).to eq false
+
+	end
+
+	it 'should update the local filename when #update is called with the same remote_path arg' do
+
+		remote_path = '/remote/path.txt'
+		deleted_local_filename = 'deleted-local-filename.txt'
+		local_filename = 'local-filename.txt'
+		deleted_content = 'deleted-file-content'
+		content = 'file-content'
+
+		@storage.update(remote_path, deleted_local_filename, deleted_content)
+		@storage.update(remote_path, local_filename, content)
+		local_path = @storage.get_local_path(remote_path)
+		expect(local_path).to eq File.join(@tempdir, local_filename)
+
+	end
+
+	it 'should update the local content when #update is called with the same remote_path arg' do
+
+		remote_path = '/remote/path.txt'
+		deleted_local_filename = 'deleted-local-filename.txt'
+		local_filename = 'local-filename.txt'
+		deleted_content = 'deleted-file-content'
+		content = 'file-content'
+
+		@storage.update(remote_path, deleted_local_filename, deleted_content)
+		@storage.update(remote_path, local_filename, content)
+		expect(@storage.get_content(remote_path)).to eq content
 
 	end
 
