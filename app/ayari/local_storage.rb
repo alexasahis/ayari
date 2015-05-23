@@ -111,7 +111,7 @@ module Ayari
 				if target.count == 0
 					@table.insert(remote_path: remote_path.downcase, local_filename: local_filename)
 				else
-					old_path = File.join(@root, target[:local_filename])
+					old_path = File.join(@root, target.first[:local_filename])
 					FileUtils.rm(old_path)
 					target.update(local_filename: local_filename)
 				end
