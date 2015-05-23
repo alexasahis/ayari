@@ -1,15 +1,15 @@
 require 'rspec_helper'
-require 'ayari/storage'
+require 'ayari/local_storage'
 
 
-describe Ayari::Storage do
+describe Ayari::LocalStorage do
 
 	before do
 
-		Ayari::Storage.any_instance.stubs(:raw_initialize).returns(nil)
-		Ayari::Storage.any_instance.stubs(:raw_write).returns(nil)
-		Ayari::Storage.any_instance.stubs(:raw_read).returns('')
-		Ayari::Storage.any_instance.stubs(:raw_size).returns(nil)
+		Ayari::LocalStorage.any_instance.stubs(:raw_initialize).returns(nil)
+		Ayari::LocalStorage.any_instance.stubs(:raw_write).returns(nil)
+		Ayari::LocalStorage.any_instance.stubs(:raw_read).returns('')
+		Ayari::LocalStorage.any_instance.stubs(:raw_size).returns(nil)
 
 	end
 
@@ -17,7 +17,7 @@ describe Ayari::Storage do
 
 		@mem_db = Sequel.sqlite
 		Sequel.expects(:connect).returns(@mem_db)
-		@storage = Ayari::Storage.new
+		@storage = Ayari::LocalStorage.new
 
 	end
 
@@ -42,7 +42,7 @@ describe Ayari::Storage do
 		@storage.update_content(remote_path, content)
 		@storage.update_local_filename(remote_path, local_filename)
 		local_path = @storage.get_local_path(remote_path)
-		expect(local_path).to eq File.join(Ayari::Storage::CACHE_DIRECTORY, local_filename)
+		expect(local_path).to eq File.join(Ayari::LocalStorage::CACHE_DIRECTORY, local_filename)
 
 	end
 

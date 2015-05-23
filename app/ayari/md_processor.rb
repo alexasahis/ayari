@@ -1,7 +1,6 @@
 require 'redcarpet'
 require 'yaml'
 require 'deep_hash_transform'
-require 'ayari/storage'
 require 'ayari/ayari_flavored_renderer'
 
 

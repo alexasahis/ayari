@@ -18,7 +18,7 @@ module Ayari
 
 		get /\A(.*)\z/ do |req_path|
 
-			storage = Ayari::Storage.new
+			storage = Ayari::Storage.create_storage
 
 			remote_path_list = [req_path]
 			remote_path_list += INFERRING_FILENAMES.map { |fname| File.join(req_path, fname) }

@@ -19,7 +19,7 @@ module Ayari
 		def initialize(access_token, logger=nil)
 
 			@dropbox_client = DropboxClient.new(access_token)
-			@storage = Ayari::Storage.new
+			@storage = Ayari::Storage.create_storage
 			@cursor = nil
 			@logger = logger
 
