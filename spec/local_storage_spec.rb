@@ -19,8 +19,7 @@ describe Ayari::LocalStorage do
 		local_filename = 'local-filename.txt'
 		content = 'file-content'
 
-		@storage.update_content(remote_path, content)
-		@storage.update_local_filename(remote_path, local_filename)
+		@storage.update(remote_path, local_filename, content)
 		expect(@storage.exists?(remote_path)).to eq true
 
 	end
@@ -31,8 +30,7 @@ describe Ayari::LocalStorage do
 		local_filename = 'local-filename.txt'
 		content = 'file-content'
 
-		@storage.update_content(remote_path, content)
-		@storage.update_local_filename(remote_path, local_filename)
+		@storage.update(remote_path, local_filename, content)
 		local_path = @storage.get_local_path(remote_path)
 		expect(local_path).to eq File.join(@tempdir, local_filename)
 
@@ -58,8 +56,7 @@ describe Ayari::LocalStorage do
 		local_filename = 'local-filename.txt'
 		content = 'file-content'
 
-		@storage.update_content(remote_path, content)
-		@storage.update_local_filename(remote_path, local_filename)
+		@storage.update(remote_path, local_filename, content)
 		@storage.remove_r(remote_path)
 
 		expect(@storage.exists?(remote_path)).to eq false
@@ -77,8 +74,7 @@ describe Ayari::LocalStorage do
 		remote_dir_paths.each do |remote_dir|
 
 			remote_path = File.join(remote_dir, remote_filename)
-			@storage.update_content(remote_path, content)
-			@storage.update_local_filename(remote_path, local_filename)
+			@storage.update(remote_path, local_filename, content)
 			expect(@storage.exists?(remote_path)).to eq true
 			@storage.remove_r(remote_dir)
 			expect(@storage.exists?(remote_path)).to eq false
@@ -87,17 +83,5 @@ describe Ayari::LocalStorage do
 		end
 
 	end
-
-	it 'should not update local filename when only #update_content is called' do
-
-		remote_path = '/remote/path.txt'
-		local_filename = 'local-filename.txt'
-		content = 'file-content'
-
-		@storage.update_content(local_filename, content)
-		expect(@storage.exists?(remote_path)).to eq false
-		expect{@storage.get_local_path(remote_path)}.to raise_error
-
-	end
-
+	
 end

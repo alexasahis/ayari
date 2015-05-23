@@ -20,6 +20,7 @@ module Ayari
 			sequel_connection_string=SEQUEL_CONNECTION_STRING)
 
 			@root = cache_directory
+			@sequel_connection_string = sequel_connection_string
 			FileUtils.mkdir_p(cache_directory)
 			@db = Sequel.connect(sequel_connection_string)
 
@@ -30,6 +31,12 @@ module Ayari
 		end
 
 		def initialize_database(force=false)
+
+			# delete all files out of the transaction for sqlite
+			if force
+				FileUtils.rm_r(@root)
+				FileUtils.mkdir_p(@root)
+			end
 
 			@db.transaction(isolation: :serializable) do
 
@@ -65,6 +72,7 @@ module Ayari
 			rescue
 			end
 			size
+
 		end
 
 		def get_local_path(remote_path)
@@ -78,13 +86,13 @@ module Ayari
 
 		end
 
-		def get_content(path)
+		def get_content(remote_path)
 
 			data = nil
 
 			@db.transaction(isolation: :repeatable) do
 
-				local_path = get_local_path(path)
+				local_path = get_local_path(remote_path)
 				data = File.binread(local_path)
 
 			end
@@ -93,26 +101,21 @@ module Ayari
 
 		end
 
-		def update_local_filename(remote_path, local_filename)
+		def update(remote_path, local_filename, content)
 
 			@db.transaction(isolation: :serializable) do
 
 				target = @table.where(remote_path: remote_path.downcase).for_update
+				local_path = File.join(@root, local_filename)
+
 				if target.count == 0
 					@table.insert(remote_path: remote_path.downcase, local_filename: local_filename)
 				else
+					old_path = File.join(@root, target[:local_filename])
+					FileUtils.rm(old_path)
 					target.update(local_filename: local_filename)
 				end
 
-			end
-
-		end
-
-		def update_content(local_filename, content)
-
-			@db.transaction(isolation: :serializable) do
-
-				local_path = File.join(@root, local_filename)
 				FileUtils.mkdir_p(File.dirname(local_path))
 				File.binwrite(local_path, content)
 
@@ -130,8 +133,18 @@ module Ayari
 
 			@db.transaction(isolation: :serializable) do
 
-				@table.where(Sequel.like(:remote_path, target)).delete
-				@table.where(remote_path: remote_path).delete
+				children_cursor = @table.where(Sequel.like(:remote_path, target))
+				file_cursor = @table.where(remote_path: escaped_path)
+
+				del_children = children_cursor.all.map{ |item| File.join(@root, item[:local_filename]) }
+				del_file = file_cursor.all.map {|item| File.join(@root, item[:local_filename]) }
+
+				(del_children + del_file).each do |del_target|
+					FileUtils.rm(del_target)
+				end
+
+				children_cursor.delete
+				file_cursor.delete
 
 			end
 

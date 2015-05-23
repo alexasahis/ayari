@@ -73,7 +73,10 @@ module Ayari
 			entries = delta_info['entries']
 			@cursor = delta_info['cursor']
 
-			@storage.remove_r('') if delta_info['reset']
+			if delta_info['reset']
+				@storage.remove_r('')
+				put_log("reset")
+			end
 
 			entries.each do |remote_path, metadata|
 
@@ -95,12 +98,9 @@ module Ayari
 						put_log("error when downloading: #{remote_path}")
 						next
 					end
-					@storage.update_content(cache_filename, content)
-					put_log("created: #{cache_filename}")
+					@storage.update(remote_path, cache_filename, content)
+					put_log("created: #{remote_path} -> #{cache_filename}")
 				end
-
-				@storage.update_local_filename(remote_path, cache_filename)
-				put_log("linked: #{remote_path} -> #{cache_filename}")
 
 			end
 
