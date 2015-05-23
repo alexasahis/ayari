@@ -7,7 +7,7 @@ module Ayari
 
 	class LocalStorage
 
-		CACHE_DIRECTORY = File.join(File.dirname(__FILE__), "ayari_cache")
+		CACHE_DIRECTORY = File.join(File.dirname(__FILE__), '..', '..', "ayari_cache")
 		SEQUEL_CONNECTION_STRING = "sqlite://#{File.join(CACHE_DIRECTORY, "cache.db")}"
 		TABLE_NAME = :content
 
