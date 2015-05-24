@@ -91,21 +91,18 @@ module Ayari
 				cache_filename = to_cache_filename(metadata)
 				size = metadata['bytes']
 
-				if @storage.get_local_filesize(cache_filename) != size
-
-					begin
-						content = @dropbox_client.get_file(remote_path)
-					rescue
-						put_log("error when downloading: #{remote_path}")
-						next
-					end
-
-					existed = @storage.exists?(remote_path)
-					@storage.update(remote_path, cache_filename, content)
-
-					event_str = existed ? 'updated' : 'created'
-					put_log("#{event_str}: #{remote_path} -> #{cache_filename}")
+				begin
+					content = @dropbox_client.get_file(remote_path)
+				rescue
+					put_log("error when downloading: #{remote_path}")
+					next
 				end
+
+				existed = @storage.exists?(remote_path)
+				@storage.update(remote_path, cache_filename, content)
+
+				event_str = existed ? 'updated' : 'created'
+				put_log("#{event_str}: #{remote_path} -> #{cache_filename}")
 
 			end
 
