@@ -71,6 +71,60 @@ describe Ayari::MdProcessor do
 
 		end
 
+		context 'when it is called with a normal-style markdown text' do
+
+			subject(:md_text) {
+				'''---
+					template: "hoge.haml"
+					markdown:
+					hard_wrap: true
+					safe_links_only: true
+					other: "options"
+					are:
+					contained: "within"
+					locals: true
+					---
+					##waf {.class-arg #id-arg}
+					relka
+					dotnet
+					[safe link](http://example.com)
+					[unsafe link](hoge://example.com)
+				'''.lines.map { |l| l.gsub("\t", '').chomp }.join("\n")
+			}
+
+			it 'should not process arguments of h elements' do
+
+				raw_html, _, __ = Ayari::MdProcessor.process_md(md_text)
+				expect(raw_html).not_to include('class="class-arg"')
+				expect(raw_html).not_to include('id="id-arg"')
+				expect(raw_html).to include('{.class-arg #id-arg}')
+
+			end
+
+		end
+
+		context 'when it is called with an invalid markdown text' do
+
+			subject(:md_text) {
+				'''---
+					template: "hoge.haml"
+
+					##waf {.class-arg #id-arg}
+					relka
+					dotnet
+					[safe link](http://example.com)
+					[unsafe link](hoge://example.com)
+				'''.lines.map { |l| l.gsub("\t", '').chomp }.join("\n")
+			}
+
+			it 'should raise an error' do
+
+				expect{ Ayari::MdProcessor.process_md(md_text) }.to raise_error
+
+			end
+
+		end
+
 	end
 
 end
