@@ -56,17 +56,6 @@ module Ayari
 
 		end
 
-		def clear()
-
-			Dir.foreach(Ayari::Storage::CACHE_DIRECTORY).each do |fname|
-				path = File.join(Ayari::Storage::CACHE_DIRECTORY, fname)
-				next if File.directory?(path)
-				File.delete(path)
-				put_log("deleted: #{path}")
-			end
-
-		end
-
 		def sync()
 
 			delta_info = @dropbox_client.delta(@cursor)

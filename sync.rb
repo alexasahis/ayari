@@ -14,12 +14,6 @@ if __FILE__ == $0
 	logger.datetime_format = '%Y/%m/%d-%H:%M:%S.%L' if logger
 	client = Ayari::SyncClient.new(token, logger)
 
-	if ARGV.include?('--reset')
-		client.clear
-		exit
-	end
-
-
 	loop do
 
 		backoff = nil
