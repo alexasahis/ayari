@@ -9,7 +9,7 @@
 
 	$ git clone https://github.com/wafrelka/ayari.git
 	$ cd ayari
-	$ bundle install --without test
+	$ bundle install --without test --path vendor/bundle
 	$ echo 'dropbox_token: "xxx"' > config.yaml
 sqlite3.gem を入れるので関連ファイルをインストールする必要があるかもしれない。
 Dropbox のトークンはがんばって自分で取得してください。
@@ -26,10 +26,10 @@ thin でなくても動く……はず？
 
 `/hoge.fuga`へのリクエストに対して
 
-+ `/hoge.fuga`
-+ `/hoge.fuga.md`
-+ `/hoge.fuga/index.md`
-+ `/hoge.fuga/top.md`
+1. `/hoge.fuga`
+2. `/hoge.fuga.md`
+3. `/hoge.fuga/index.md`
+4. `/hoge.fuga/top.md`
 
 という順番でファイルを見て行き一番最初に見つかったものをレンダリングする。
 
@@ -107,5 +107,6 @@ template, markdown, flavor 以外のオプションは
 すべて haml のレンダリング時にローカル変数として渡される。
 なおキーはすべて Symbol に変換される。
 
-## Authors
-- わふれるか。
+## Miscellaneous
+- Author: わふれるか。
+- Licence: 修正BSDライセンスとかだろうか
