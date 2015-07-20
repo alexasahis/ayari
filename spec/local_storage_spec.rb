@@ -43,7 +43,7 @@ describe Ayari::LocalStorage do
 				expect(storage.get_local_path(remote_path)).to eq local_path
 			end
 			it 'should raise an error if the file does not exist' do
-				expect{ storage.get_local_path(wrong_remote_path) }.to raise_error
+				expect{ storage.get_local_path(wrong_remote_path) }.to raise_error(ArgumentError)
 			end
 		end
 
@@ -52,7 +52,7 @@ describe Ayari::LocalStorage do
 				expect(storage.get_content(remote_path)).to eq content
 			end
 			it 'should raise an error if the file does not exist' do
-				expect{ storage.get_content(wrong_remote_path) }.to raise_error
+				expect{ storage.get_content(wrong_remote_path) }.to raise_error(ArgumentError)
 			end
 		end
 
@@ -61,7 +61,7 @@ describe Ayari::LocalStorage do
 				expect(storage.get_updated_time(remote_path)).to eq updated_at
 			end
 			it 'should raise an error if the file does not exist' do
-				expect{ storage.get_updated_time(wrong_remote_path) }.to raise_error
+				expect{ storage.get_updated_time(wrong_remote_path) }.to raise_error(ArgumentError)
 			end
 		end
 
@@ -145,9 +145,9 @@ describe Ayari::LocalStorage do
 				# TODO: split this
 
 				expect(storage.exists?(deleted_remote_path)).to eq false
-				expect{ storage.get_local_path(deleted_remote_path) }.to raise_error
-				expect{ storage.get_content(deleted_remote_path) }.to raise_error
-				expect{ storage.get_updated_time(deleted_remote_path) }.to raise_error
+				expect{ storage.get_local_path(deleted_remote_path) }.to raise_error(ArgumentError)
+				expect{ storage.get_content(deleted_remote_path) }.to raise_error(ArgumentError)
+				expect{ storage.get_updated_time(deleted_remote_path) }.to raise_error(ArgumentError)
 				expect(File.exists?(deleted_local_path)).to eq false
 
 			end

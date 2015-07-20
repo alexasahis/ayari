@@ -119,7 +119,7 @@ describe Ayari::MdProcessor do
 
 			it 'should raise an error' do
 
-				expect{ Ayari::MdProcessor.process_md(md_text) }.to raise_error
+				expect{ Ayari::MdProcessor.process_md(md_text) }.to raise_error(ArgumentError)
 
 			end
 
