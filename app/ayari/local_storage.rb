@@ -91,10 +91,18 @@ module Ayari
 
 			data = nil
 
-			@db.transaction(isolation: :repeatable) do
+			begin
 
-				local_path = get_local_path(remote_path)
-				data = File.binread(local_path)
+				@db.transaction(isolation: :repeatable) do
+
+					local_path = get_local_path(remote_path)
+					data = File.binread(local_path)
+
+				end
+
+			rescue Sequel::DatabaseError => db_err
+
+				raise db_err.wrapped_exception
 
 			end
 
