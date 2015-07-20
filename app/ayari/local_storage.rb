@@ -80,7 +80,7 @@ module Ayari
 
 			results = @table.where(remote_path: remote_path.downcase).all
 			if results.count != 1
-				raise StandardError.new('invalid path')
+				raise ArgumentError.new('invalid path')
 			end
 
 			File.join(@root, results.first[:local_filename])
@@ -106,7 +106,7 @@ module Ayari
 
 			results = @table.where(remote_path: remote_path.downcase).all
 			if results.count != 1
-				raise StandardError.new('invalid path')
+				raise ArgumentError.new('invalid path')
 			end
 
 			results.first[:updated_at]
