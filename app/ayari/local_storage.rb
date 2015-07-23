@@ -23,6 +23,7 @@ module Ayari
 			@sequel_connection_string = sequel_connection_string.dup.freeze
 			FileUtils.mkdir_p(cache_directory)
 			@db = Sequel.connect(sequel_connection_string)
+			Sequel::DATABASES.delete(@db)
 
 			initialize_database()
 
