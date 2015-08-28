@@ -16,7 +16,7 @@ Dropbox のトークンはがんばって自分で取得してください。
 
 ## Operation
 
-	$ bundle exec ruby sync.rb
+	$ bundle exec rake sync
 動かしているあいだ Dropbox のアプリフォルダとローカルデータを同期してくれる……といいな。
 
 	$ bundle exec thin start -p 8080

@@ -4,7 +4,7 @@ require 'yaml'
 require 'ayari/sync_client'
 
 
-if __FILE__ == $0
+task 'sync' do
 
 	yaml_path = File.join(File.dirname(__FILE__), 'config.yaml')
 	config = YAML.load_file(yaml_path)
@@ -37,5 +37,19 @@ if __FILE__ == $0
 		end
 
 	end
+
+end
+
+task 'download' do
+
+	yaml_path = File.join(File.dirname(__FILE__), 'config.yaml')
+	config = YAML.load_file(yaml_path)
+
+	token = config['dropbox_token']
+	logger = Logger.new(STDOUT)
+	logger.datetime_format = '%Y/%m/%d-%H:%M:%S.%L' if logger
+	client = Ayari::SyncClient.new(token, logger)
+
+	client.sync
 
 end
