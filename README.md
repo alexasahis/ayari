@@ -28,8 +28,10 @@ thin でなくても動く……はず？
 
 1. `/hoge.fuga`
 2. `/hoge.fuga.md`
-3. `/hoge.fuga/index.md`
-4. `/hoge.fuga/top.md`
+3. `/hoge.fuga.haml`
+4. `/hoge.fuga.html`
+5. `/hoge.fuga/index.md`
+6. `/hoge.fuga/top.md`
 
 という順番でファイルを見て行き一番最初に見つかったものをレンダリングする。
 

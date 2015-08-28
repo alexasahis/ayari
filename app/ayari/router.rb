@@ -9,7 +9,7 @@ module Ayari
 
 	class Router < Sinatra::Base
 
-		INFERRING_EXTS = ['.md']
+		INFERRING_EXTS = ['.md', '.haml', '.html']
 		INFERRING_FILENAMES = ['index.md', 'top.md']
 
 		configure :development do
@@ -20,11 +20,11 @@ module Ayari
 
 			storage = Ayari::Storage.create_storage
 
-			remote_path_list = [req_path]
+			remote_path_list = []
+
+			remote_path_list += [req_path]
+			remote_path_list += INFERRING_EXTS.map { |ext| req_path + ext }
 			remote_path_list += INFERRING_FILENAMES.map { |fname| File.join(req_path, fname) }
-			if File.extname(req_path) == ""
-				remote_path_list += INFERRING_EXTS.map { |ext| req_path + ext }
-			end
 
 			remote_path = remote_path_list.find { |path| storage.exists?(path) }
 
