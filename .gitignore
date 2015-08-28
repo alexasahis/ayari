@@ -1,2 +1,4 @@
 ayari_cache
 config.yaml
+.bundle
+vendor
