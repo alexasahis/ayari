@@ -23,6 +23,10 @@ module Ayari
 			@sequel_connection_string = sequel_connection_string.dup.freeze
 			FileUtils.mkdir_p(cache_directory)
 			@db = Sequel.connect(sequel_connection_string)
+
+			# remove the connection from Sequel's cache
+			#   in order to prevent file descriptor leakage
+			#   when using sqlite as the database server
 			Sequel::DATABASES.delete(@db)
 
 			initialize_database()
@@ -33,7 +37,9 @@ module Ayari
 
 		def initialize_database(force=false)
 
-			# delete all files out of the transaction for sqlite
+			# delete all files before the transaction begins because
+			#   deleting sqlite's file in the transaction causes an Exception
+			# this is not good in terms of consistency
 			if force
 				FileUtils.rm_r(@root)
 				FileUtils.mkdir_p(@root)
@@ -73,6 +79,7 @@ module Ayari
 				size = File.size(local_path)
 			rescue
 			end
+
 			size
 
 		end
@@ -152,8 +159,6 @@ module Ayari
 			remote_path = remote_path[0..-2] if remote_path[-1] == "/"
 			escaped_path = @table.escape_like(remote_path.downcase)
 			target = escaped_path + '/%'
-
-			local_path_list = []
 
 			@db.transaction(isolation: :serializable) do
 

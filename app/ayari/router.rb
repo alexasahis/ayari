@@ -9,8 +9,8 @@ module Ayari
 
 	class Router < Sinatra::Base
 
-		INFERRING_EXTS = ['.md', '.haml', '.html']
-		INFERRING_FILENAMES = ['index.md', 'top.md']
+		EXT_CANDIDATES = ['.md', '.haml', '.html']
+		FILENAME_CANDIDATES = ['index.md', 'top.md']
 
 		configure :development do
 			enable :logging
@@ -23,8 +23,8 @@ module Ayari
 			remote_path_list = []
 
 			remote_path_list += [req_path]
-			remote_path_list += INFERRING_EXTS.map { |ext| req_path + ext }
-			remote_path_list += INFERRING_FILENAMES.map { |fname| File.join(req_path, fname) }
+			remote_path_list += EXT_CANDIDATES.map { |ext| req_path + ext }
+			remote_path_list += FILENAME_CANDIDATES.map { |fname| File.join(req_path, fname) }
 
 			remote_path = remote_path_list.find { |path| storage.exists?(path) }
 

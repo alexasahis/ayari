@@ -10,7 +10,9 @@ module Ayari
 	class SyncClient
 
 		LONGPOLL_DELTA_URL = 'https://api-notify.dropbox.com/1/longpoll_delta'
+		POLL_TIMEOUT = 90
 		private_constant :LONGPOLL_DELTA_URL
+		private_constant :POLL_TIMEOUT
 
 		def put_log(msg)
 			@logger.info(msg) if @logger
@@ -42,11 +44,10 @@ module Ayari
 
 			return if !@cursor
 
-			timeout = 90
 			http_client = HTTPClient.new
-			http_client.receive_timeout = timeout + 100
+			http_client.receive_timeout = POLL_TIMEOUT + 100
 			http_client.ssl_config.ssl_version = :SSLv23
-			params = {cursor: @cursor, timeout: timeout}
+			params = {cursor: @cursor, timeout: POLL_TIMEOUT}
 
 			loop do
 				raw_res = http_client.get_content(LONGPOLL_DELTA_URL, params)
