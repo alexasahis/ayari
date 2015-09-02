@@ -52,7 +52,7 @@ Redcarpet を使ってレンダリングしている。
 	---
 などと YAML 形式でオプションを書いて`---`で囲う必要がある。
 
-### Template Option
+### Template Option (Required)
 
 markdown ファイルは haml ファイルに埋め込む形でしか利用できず、ファイルの先頭で
 
@@ -61,8 +61,9 @@ markdown ファイルは haml ファイルに埋め込む形でしか利用で�
 	---
 
 として template オプションを用いて埋め込む先の haml を指定する必要がある。
+このオプションが見つからないとエラーとなる。
 
-### Markdown Option
+### Markdown Option (Optional)
 
 	---
 	template: "/template.haml"
@@ -73,7 +74,7 @@ markdown ファイルは haml ファイルに埋め込む形でしか利用で�
 
 などと markdown オプションを用いて Redcarpet のオプションを指定できる。
 
-### Flavor Option
+### Flavor Option (Optional)
 
 	---
 	template: "/template.haml"
