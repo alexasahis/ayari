@@ -1,4 +1,3 @@
-require 'digest/sha2'
 require 'haml'
 require 'sinatra/base'
 require 'ayari/storage'

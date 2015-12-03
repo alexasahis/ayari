@@ -1,5 +1,6 @@
 require 'sqlite3'
 require 'sequel'
+require 'digest/md5'
 require 'dropbox_sdk'
 require 'httpclient'
 require 'ayari/storage'
